@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import vkrpk.musique.controllers.ICommand;
 import vkrpk.musique.controllers.PageAccueilController;
@@ -19,14 +20,12 @@ import vkrpk.musique.controllers.PageCreationController;
 import vkrpk.musique.controllers.PageListeController;
 import vkrpk.musique.controllers.PageModificationController;
 import vkrpk.musique.controllers.PageSuppressionController;
-import vkrpk.musique.log.FormatterLog;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import static vkrpk.musique.log.LoggerECFJakarta.LOGGER;
 
 /**
 *
@@ -35,6 +34,7 @@ import static vkrpk.musique.log.LoggerECFJakarta.LOGGER;
 @WebServlet(urlPatterns = {"/FrontControllerServlet"}, name = "FrontControllerServlet")
 public class FrontControllerServlet extends HttpServlet {
 
+    private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
     private Map<String, Object> commands = new HashMap<>();
 
     /**
@@ -48,21 +48,14 @@ public class FrontControllerServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String urlSuite = null;
         try {
-            response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-            response.setHeader("Pragma", "no-cache");
-            response.setHeader("Expires", "0");
-            FileHandler fh = new FileHandler("LogReverso.log", true);
-            LOGGER.setUseParentHandlers(false);
-            LOGGER.addHandler(fh);
-            fh.setFormatter(new FormatterLog());
-
-            LOGGER.log(Level.INFO, "Démarrage de l'application");
-
             String cmd = request.getParameter("cmd");
             ICommand com = (ICommand) commands.get(cmd);
             urlSuite = com.execute(request, response);
+
         } catch (Exception e) {
             urlSuite = "/erreur.jsp";
+            request.setAttribute("message", "Une erreur inconnues est survenue. Veuillez contacter l'administrateur du site.");
+            LOGGER.log(Level.SEVERE, e.getMessage());
         } finally {
             request.getRequestDispatcher("WEB-INF/JSP" + urlSuite).forward(request, response);
         }

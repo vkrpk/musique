@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class PageAccueilController implements ICommand {
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
+        request.setAttribute("test", "testattribute");
         return "/accueil.jsp" ;
     }
 }
