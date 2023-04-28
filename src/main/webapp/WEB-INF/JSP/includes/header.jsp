@@ -1,4 +1,3 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,6 +8,7 @@
     <link rel="stylesheet" href="musique/css/style.css">
 </head>
 <body style=" display: flex;flex-direction: column;min-height: 100vh;align-items: center;">
+
     <nav class="navbar navbar-expand-lg bg-body-tertiary w-100">
         <div class="container-fluid">
           <a class="navbar-brand" href="#">Music School</a>
@@ -37,4 +37,9 @@
         </div>
       </nav>
       <main style="flex-grow: 1;">
-
+test<c:forEach var="i" begin="0" end="10" step="2">
+  <tr>
+     <td><c:out value="${i}"/></td>
+     <td><c:out value="${2*x}"/></td>
+  </tr>
+</c:forEach>
