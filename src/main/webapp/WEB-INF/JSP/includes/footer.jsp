@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 </main>
-<footer class="container-fluid">
+<footer class="container-fluid bg-secondary">
     <section class="container d-flex flex-col flex-md-row justify-content-evenly">
         <a href="/?cmd=accueil">Accueil</a>
         <a href="/cmd=liste">Liste</a>

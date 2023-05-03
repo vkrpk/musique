@@ -1,10 +1,6 @@
-<html>
-<body>
-<h2>Hello World!</h2>
-<form method="post">
-    <input type="text" name="name" />
-    <input type="submit" value="Submit" />
-</form>
-<h1>Suppression JSP</h1>
-</body>
-</html>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:include page="./includes/header.jsp">
+    <jsp:param name="titre" value="Suppression Personne"/>
+</jsp:include>
+
+<jsp:include page="./includes/footer.jsp"></jsp:include>
