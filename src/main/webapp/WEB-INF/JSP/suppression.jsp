@@ -6,11 +6,11 @@
     <label class="mb-2" for="adherent-select">Modifier un adhérent:</label>
     <select name="supprimerAdherent" class="form-select mb-3" aria-label="Default select example" id="adherent-select">
         <c:forEach items="${listePersonnes}" var="personne">
-            <option value="${personne.id}">${personne.nom} ${personne.prenom}</option>
+            <option value="<c:out value="${personne.id}"/>">${personne.nom} ${personne.prenom}</option>
         </c:forEach>
     </select>
     <c:if test="${not empty adherentASupprimer}">
-        <input type="hidden" name="idAdherentASupprimer" value="${adherentASupprimer.id}">
+        <input type="hidden" name="idAdherentASupprimer" value="<c:out value="${adherentASupprimer.id}"/>">
     </c:if>
     <button type="submit" class="btn btn-primary text-center">${not empty adherentASupprimer ? "Confirmer" : "Supprimer cet adhérent"}</button>
 </form>

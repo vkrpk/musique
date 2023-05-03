@@ -22,6 +22,7 @@ import vkrpk.musique.controllers.PageModificationController;
 import vkrpk.musique.controllers.PageSuppressionController;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,8 +48,11 @@ public class FrontControllerServlet extends HttpServlet {
     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String urlSuite = null;
-        HttpSession session = request.getSession();
         try {
+            HttpSession session = request.getSession();
+            Cookie cookie = new Cookie("expiration", "1an");
+            cookie.setMaxAge(60 * 60 * 24 * 365);
+            response.addCookie(cookie);
             if (session.getAttribute("compteurPage") == null) {
                 session.setAttribute("compteurPage", 0);
             }
