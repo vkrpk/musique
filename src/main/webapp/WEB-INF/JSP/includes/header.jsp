@@ -18,19 +18,19 @@
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="#">Accueil</a>
+                <a class="nav-link" aria-current="page" href="<c:url value='/'/>">Accueil</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Liste</a>
+                <a class="nav-link" href="<c:url value='/?cmd=liste'/>">Liste</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Creation</a>
+                <a class="nav-link" href="<c:url value='/?cmd=creation'/>">Creation</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Modification</a>
+                <a class="nav-link" href="<c:url value='/?cmd=modification'/>">Modification</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Suppression</a>
+                <a class="nav-link" href="<c:url value='/?cmd=suppression'/>">Suppression</a>
               </li>
             </ul>
           </div>

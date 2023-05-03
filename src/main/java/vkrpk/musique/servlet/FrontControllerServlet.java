@@ -25,6 +25,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 
 /**
@@ -33,7 +34,6 @@ import jakarta.servlet.http.HttpServletResponse;
 */
 @WebServlet(urlPatterns = {"/FrontControllerServlet"}, name = "FrontControllerServlet")
 public class FrontControllerServlet extends HttpServlet {
-
     private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
     private Map<String, Object> commands = new HashMap<>();
 
@@ -47,7 +47,12 @@ public class FrontControllerServlet extends HttpServlet {
     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String urlSuite = null;
+        HttpSession session = request.getSession();
         try {
+            if (session.getAttribute("compteurPage") == null) {
+                session.setAttribute("compteurPage", 0);
+            }
+            session.setAttribute("compteurPage", (int) session.getAttribute("compteurPage") + 1);
             String cmd = request.getParameter("cmd");
             ICommand com = (ICommand) commands.get(cmd);
             urlSuite = com.execute(request, response);
@@ -90,7 +95,7 @@ public class FrontControllerServlet extends HttpServlet {
 
     @Override
     public void init(){
-        commands.put("accueil", new PageAccueilController());
+        commands.put(null, new PageAccueilController());
         commands.put("liste", new PageListeController());
         commands.put("creation", new PageCreationController());
         commands.put("suppression", new PageSuppressionController());
