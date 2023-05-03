@@ -10,6 +10,7 @@ import jakarta.validation.ValidatorFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import vkrpk.musique.models.Personne;
+import vkrpk.musique.models.forms.SaisiePersonForm;
 
 public class PageModificationController implements ICommand {
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception
@@ -26,7 +27,7 @@ public class PageModificationController implements ICommand {
         listePersonnes.add(personne2);
 
         Personne personneTrouvee = null;
-        if(request.getParameter("modifierAdherent") != null){
+        if(request.getParameterMap().containsKey("modifierAdherent")){
             for (Personne p : listePersonnes) {
                 if (Integer.toString(p.getId()).equals(request.getParameter("modifierAdherent"))) {
                     personneTrouvee = p;
@@ -36,7 +37,7 @@ public class PageModificationController implements ICommand {
             request.setAttribute("personneTrouvee", personneTrouvee);
         }
 
-        if(request.getParameter("nom") != null && request.getParameter("prenom") != null) {
+        if(request.getParameterMap().containsKey("nom")) {
             for (Personne p : listePersonnes) {
                 if (Integer.toString(p.getId()).equals(request.getParameter("id")) ) {
                     Personne personneModifiee = new Personne(
@@ -45,11 +46,23 @@ public class PageModificationController implements ICommand {
                         request.getParameter("prenom")
                     );
                     Set<ConstraintViolation<Personne>> violations = validator.validate(personneModifiee);
-                    if (violations.isEmpty()) {
+                    SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
+                    saisiePersonForm.verifForm(request);
+                    String resultatSaisi = saisiePersonForm.getResultat();
+                    if(violations.isEmpty() && resultatSaisi.equals("OK")){
                         p.setNom(request.getParameter("nom"));
                         p.setPrenom(request.getParameter("prenom"));
                         request.setAttribute("personneTrouvee", null);
-                    } else {
+                        request.setAttribute("modificationAdherentValide", "Un adhérent a bien été modifié");
+                    }
+                    if(!resultatSaisi.equals("OK")) {
+                        personneTrouvee.setNom(request.getParameter("nom"));
+                        personneTrouvee.setPrenom(resultatSaisi);
+                        request.setAttribute("duplicateNom", resultatSaisi);
+                    }
+                    if(!violations.isEmpty()) {
+                        personneTrouvee.setNom(request.getParameter("nom"));
+                        personneTrouvee.setPrenom(request.getParameter("prenom"));
                         request.setAttribute("violations", violations);
                     }
                     break;
@@ -57,6 +70,7 @@ public class PageModificationController implements ICommand {
             }
         }
         request.setAttribute("listePersonnes", listePersonnes);
+        request.setAttribute("controller", "modification");
 
         return "/modification.jsp" ;
     }
