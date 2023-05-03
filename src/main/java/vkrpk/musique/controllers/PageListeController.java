@@ -14,8 +14,7 @@ import vkrpk.musique.models.Personne;
 public class PageListeController implements ICommand {
     public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception
     {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+
 
         // request.setAttribute("listePersonnes", listePersonnes);
         return "/liste.jsp" ;
