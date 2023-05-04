@@ -1,6 +1,7 @@
 package vkrpk.musique.controllers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -9,69 +10,87 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import vkrpk.musique.exception.CommandExecutionException;
 import vkrpk.musique.models.Personne;
 import vkrpk.musique.models.forms.SaisiePersonForm;
 
 public class PageModificationController implements ICommand {
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception
-    {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+    private static final String OLD_PERSON_VALUES = "oldPersonValues";
+    private static ArrayList<Personne> listePersonnes = new ArrayList<>();
+    private Personne selectedPersonne = new Personne();
 
+    public PageModificationController() {
         Personne personne = new Personne(1, "Nom 1", "Prenom 1");
         Personne personne1 = new Personne(2, "Nom 2", "Prenom 2");
         Personne personne2 = new Personne(3, "Nom 3", "Prénom 3");
-        ArrayList<Personne> listePersonnes = new ArrayList<>();
-        listePersonnes.add(personne);
-        listePersonnes.add(personne1);
-        listePersonnes.add(personne2);
+        Collections.addAll(listePersonnes, personne, personne1, personne2);
+    }
 
-        Personne personneTrouvee = null;
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
+    {
+        String parameterNom = request.getParameter("nom");
+        String parameterPrenom = request.getParameter("prenom");
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        Validator validator = factory.getValidator();
+
         if(request.getParameterMap().containsKey("modifierAdherent")){
             for (Personne p : listePersonnes) {
                 if (Integer.toString(p.getId()).equals(request.getParameter("modifierAdherent"))) {
-                    personneTrouvee = p;
+                    selectedPersonne = p;
                     break;
                 }
             }
-            request.setAttribute("personneTrouvee", personneTrouvee);
+            request.setAttribute(OLD_PERSON_VALUES, selectedPersonne);
         }
 
-        if(request.getParameterMap().containsKey("nom")) {
-            for (Personne p : listePersonnes) {
-                if (Integer.toString(p.getId()).equals(request.getParameter("id")) ) {
-                    Personne personneModifiee = new Personne(
-                        p.getId(),
-                        request.getParameter("nom"),
-                        request.getParameter("prenom")
-                    );
-                    Set<ConstraintViolation<Personne>> violations = validator.validate(personneModifiee);
-                    SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
-                    saisiePersonForm.verifForm(request);
-                    String resultatSaisi = saisiePersonForm.getResultat();
-                    if(violations.isEmpty() && resultatSaisi.equals("OK")){
-                        p.setNom(request.getParameter("nom"));
-                        p.setPrenom(request.getParameter("prenom"));
-                        request.setAttribute("personneTrouvee", null);
-                        request.setAttribute("modificationAdherentValide", "Un adhérent a bien été modifié");
-                    }
-                    if(!resultatSaisi.equals("OK")) {
-                        personneTrouvee.setNom(request.getParameter("nom"));
-                        personneTrouvee.setPrenom(resultatSaisi);
-                        request.setAttribute("duplicateNom", resultatSaisi);
-                    }
-                    if(!violations.isEmpty()) {
-                        personneTrouvee.setNom(request.getParameter("nom"));
-                        personneTrouvee.setPrenom(request.getParameter("prenom"));
-                        request.setAttribute("violations", violations);
-                    }
-                    break;
-                }
-            }
+        if(request.getParameterMap().containsKey("nom") && selectedPersonne.getId() != null){
+            Personne testValidationPersonne = new Personne(null, parameterNom, parameterPrenom);
+            Set<ConstraintViolation<Personne>> violations = validator.validate(testValidationPersonne);
+
+            SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
+            saisiePersonForm.verifForm(request);
+            String resultatSaisi = saisiePersonForm.getResultat();
+
+            checkSaisiPersonForm(resultatSaisi, request, testValidationPersonne);
+            checkViolations(violations, request, testValidationPersonne);
+            checkFormIsValid(violations, request, resultatSaisi);
         }
+        request.setAttribute("selectedPersonne", selectedPersonne);
         request.setAttribute("listePersonnes", listePersonnes);
         request.setAttribute("controller", "modification");
 
         return "/modification.jsp" ;
+    }
+
+    private HttpServletRequest checkSaisiPersonForm(String resultat, HttpServletRequest request, Personne testValidationPersonne){
+        if(!resultat.equals("OK")) {
+            request.setAttribute("duplicateNom", resultat);
+            request.setAttribute(OLD_PERSON_VALUES, testValidationPersonne);
+        }
+        return request;
+    }
+
+    private HttpServletRequest checkViolations(Set<ConstraintViolation<Personne>> violations, HttpServletRequest request, Personne testValidationPersonne){
+        if(!violations.isEmpty()) {
+            request.setAttribute("violations", violations);
+            request.setAttribute(OLD_PERSON_VALUES, testValidationPersonne);
+        }
+        return request;
+    }
+
+    private HttpServletRequest checkFormIsValid(Set<ConstraintViolation<Personne>> violations, HttpServletRequest request, String resultat){
+        if(violations.isEmpty() && resultat.equals("OK")){
+            for (Personne p : listePersonnes) {
+                if (p.getId().equals(selectedPersonne.getId())) {
+                    p.setNom(request.getParameter("nom"));
+                    p.setPrenom(request.getParameter("prenom"));
+                    break;
+                }
+            }
+            selectedPersonne = null;
+            request.setAttribute("modificationAdherentValide", "Un adhérent a bien été modifié");
+        }
+        return request;
     }
 }

@@ -7,10 +7,8 @@ Properties.
 */
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +18,7 @@ import vkrpk.musique.controllers.PageCreationController;
 import vkrpk.musique.controllers.PageListeController;
 import vkrpk.musique.controllers.PageModificationController;
 import vkrpk.musique.controllers.PageSuppressionController;
+import vkrpk.musique.exception.CommandExecutionException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -36,7 +35,8 @@ import jakarta.servlet.http.HttpSession;
 @WebServlet(urlPatterns = {"/FrontControllerServlet"}, name = "FrontControllerServlet")
 public class FrontControllerServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
-    private Map<String, Object> commands = new HashMap<>();
+    private transient Map<String, Object> commands = new HashMap<>();
+    private static final String COMPTEUR_PAGE = "compteurPage";
 
     /**
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -53,18 +53,21 @@ public class FrontControllerServlet extends HttpServlet {
             Cookie cookie = new Cookie("expiration", "1an");
             cookie.setMaxAge(60 * 60 * 24 * 365);
             response.addCookie(cookie);
-            if (session.getAttribute("compteurPage") == null) {
-                session.setAttribute("compteurPage", 0);
+            if (session.getAttribute(COMPTEUR_PAGE) == null) {
+                session.setAttribute(COMPTEUR_PAGE, 0);
             }
-            session.setAttribute("compteurPage", (int) session.getAttribute("compteurPage") + 1);
+            session.setAttribute(COMPTEUR_PAGE, (int) session.getAttribute(COMPTEUR_PAGE) + 1);
             String cmd = request.getParameter("cmd");
             ICommand com = (ICommand) commands.get(cmd);
             urlSuite = com.execute(request, response);
-
-        } catch (Exception e) {
+        } catch (CommandExecutionException commandExecutionException) {
             urlSuite = "/erreur.jsp";
             request.setAttribute("message", "Une erreur inconnues est survenue. Veuillez contacter l'administrateur du site.");
-            LOGGER.log(Level.SEVERE, e.getMessage());
+            LOGGER.log(Level.SEVERE, commandExecutionException.getMessage());
+        } catch (Exception exception) {
+            urlSuite = "/erreur.jsp";
+            request.setAttribute("message", "Une erreur inconnues est survenue. Veuillez contacter l'administrateur du site.");
+            LOGGER.log(Level.SEVERE, exception.getMessage());
         } finally {
             request.getRequestDispatcher("WEB-INF/JSP" + urlSuite).forward(request, response);
         }

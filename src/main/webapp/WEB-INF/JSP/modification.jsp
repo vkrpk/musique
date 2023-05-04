@@ -8,7 +8,7 @@
             <select name="modifierAdherent" class="form-select mb-3" aria-label="Default select example" id="adherent-select">
                 <c:forEach items="${listePersonnes}" var="personne">
                     <option value="<c:out value="${personne.id}"/>"
-                        <c:if test="${not empty personneTrouvee and personne.id == personneTrouvee.id}">
+                        <c:if test="${not empty selectedPersonne.id and personne.id == selectedPersonne.id}">
                             selected="selected"
                         </c:if>
                     >
@@ -17,19 +17,19 @@
                 </c:forEach>
             </select>
         </c:if>
-        <c:if test="${not empty personneTrouvee or controller eq 'creation'}">
+        <c:if test="${not empty selectedPersonne.id or controller eq 'creation'}">
             <div class="mb-3">
                 <label for="nom" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="nom" aria-describedby="nomHelp" name="nom" value="<c:out value="${controller eq 'creation' ? '' : personneTrouvee.nom}"/>">
+                <input type="text" class="form-control" id="nom" aria-describedby="nomHelp" name="nom" value="<c:out value="${not empty oldPersonValues ? oldPersonValues.nom : ''}"/>">
                 <div id="nomHelp" class="form-text">Le nom ne doit pas dépasser 30 caractères.</div>
             </div>
             <div class="mb-3">
                 <label for="prenom" class="form-label">Prénom</label>
-                <input type="text" class="form-control" id="prenom" aria-describedby="prenomHelp" name="prenom" value="<c:out value="${controller eq 'creation' ? '' : personneTrouvee.prenom}"/>">
+                <input type="text" class="form-control" id="prenom" aria-describedby="prenomHelp" name="prenom" value="<c:out value="${not empty oldPersonValues ? oldPersonValues.prenom : ''}"/>">
                 <div id="prenomHelp" class="form-text">Le prénom doit contenir entre 2 et 30 caractères.</div>
             </div>
             <c:if test="${controller eq 'modification'}">
-                <input type="hidden" name="id" value="<c:out value="${personneTrouvee.id}"/>">
+                <input type="hidden" name="id" value="<c:out value="${selectedPersonne.id}"/>">
             </c:if>
         </c:if>
         <button type="submit" class="btn btn-primary text-center">${controller eq 'creation' ? 'Créer un adhérent' : 'Modifier un adhérent'}</button>

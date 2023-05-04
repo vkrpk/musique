@@ -4,19 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.ArrayList;
-import java.util.Set;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
+import vkrpk.musique.exception.CommandExecutionException;
 import vkrpk.musique.models.Personne;
 
 public class PageSuppressionController implements ICommand {
-    public String execute(HttpServletRequest request, HttpServletResponse response) throws Exception
+    public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
     {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-
         Personne personne = new Personne(1, "Nom 1", "Prenom 1");
         Personne personne1 = new Personne(2, "Nom 2", "Prenom 2");
         Personne personne2 = new Personne(3, "Nom 3", "Prénom 3");
@@ -46,6 +39,7 @@ public class PageSuppressionController implements ICommand {
                 }
             }
             request.setAttribute("adherentASupprimer", null);
+            request.setAttribute("suppressionAdherentValide", "Un adhérent a bien été supprimé");
         }
         return "/suppression.jsp" ;
     }

@@ -17,4 +17,7 @@
 <c:if test="${not empty adherentASupprimer}">
     <p class="text-danger">Si vous souhaitez supprimer l'adhérent : "${adherentASupprimer.prenom} ${adherentASupprimer.nom}", veuillez cliquer sur le bouton "Confirmer".</p>
 </c:if>
+<c:if test="${not empty suppressionAdherentValide}">
+    <p class="text-primary">${suppressionAdherentValide}</p>
+</c:if>
 <jsp:include page="./includes/footer.jsp"></jsp:include>

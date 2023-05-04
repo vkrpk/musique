@@ -2,7 +2,6 @@
 <jsp:include page="./includes/header.jsp">
     <jsp:param name="titre" value="Liste Personnes"/>
 </jsp:include>
-
 <c:choose>
     <c:when test="${not empty listePersonnes}">
         <h1>${message}</h1>

@@ -1,0 +1,8 @@
+version: "3.7"
+
+services:
+  sonarqube:
+    image: sonarqube:lts
+    restart: 'always'
+    ports:
+      - "8082:9000"
