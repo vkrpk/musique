@@ -19,6 +19,9 @@ import vkrpk.musique.controllers.PageListeController;
 import vkrpk.musique.controllers.PageModificationController;
 import vkrpk.musique.controllers.PageSuppressionController;
 import vkrpk.musique.exception.CommandExecutionException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -37,6 +40,8 @@ public class FrontControllerServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
     private transient Map<String, Object> commands = new HashMap<>();
     private static final String COMPTEUR_PAGE = "compteurPage";
+    public EntityManagerFactory entityManagerFactory = null;
+    public EntityManager entityManager = null;
 
     /**
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -102,10 +107,39 @@ public class FrontControllerServlet extends HttpServlet {
 
     @Override
     public void init(){
+        try {
+            entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
+            entityManager = entityManagerFactory.createEntityManager();
+            // EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
+            // EntityManager entityManager = entityManagerFactory.createEntityManager();
+            // entityManager.getTransaction().begin();
+            // entityManager.persist(employee);
+            // entityManager.getTransaction().commit();
+            entityManager.close();
+            entityManagerFactory.close();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e.getMessage());
+        } finally {
+            if ( entityManager != null ) entityManager.close();
+            if ( entityManagerFactory != null ) entityManagerFactory.close();
+        }
+        // EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
+        // EntityManager entityManager = entityManagerFactory.createEntityManager();
+        // entityManager.getTransaction().begin();
+        // entityManager.persist(employee);
+        // entityManager.getTransaction().commit();
+        // entityManager.close();
+        // entityManagerFactory.close();
+        // this.entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
         commands.put(null, new PageAccueilController());
         commands.put("liste", new PageListeController());
         commands.put("creation", new PageCreationController());
         commands.put("suppression", new PageSuppressionController());
         commands.put("modification", new PageModificationController());
+    }
+
+    public void destroy(){
+        // this.entityManager.close();
+        // this.entityManagerFactory.close();
     }
 }
