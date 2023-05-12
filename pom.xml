@@ -68,7 +68,23 @@
       <artifactId>hibernate-validator-cdi</artifactId>
       <version>7.0.5.Final</version>
     </dependency>
-
+    <!-- https://mvnrepository.com/artifact/org.glassfish.expressly/expressly -->
+    <dependency>
+      <groupId>org.glassfish.expressly</groupId>
+      <artifactId>expressly</artifactId>
+      <version>5.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.9.2</version>
+      <!--<scope>test</scope>-->
+    </dependency>
+    <dependency>
+      <groupId>com.mikemybytes</groupId>
+      <artifactId>junit5-formatted-source</artifactId>
+      <version>0.2.0</version>
+    </dependency>
   </dependencies>
 
   <build>
