@@ -40,8 +40,8 @@ public class FrontControllerServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
     private transient Map<String, Object> commands = new HashMap<>();
     private static final String COMPTEUR_PAGE = "compteurPage";
-    public EntityManagerFactory entityManagerFactory = null;
-    public EntityManager entityManager = null;
+    private EntityManagerFactory entityManagerFactory = null;
+    public static EntityManager entityManager = null;
 
     /**
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -115,14 +115,15 @@ public class FrontControllerServlet extends HttpServlet {
             // entityManager.getTransaction().begin();
             // entityManager.persist(employee);
             // entityManager.getTransaction().commit();
-            entityManager.close();
-            entityManagerFactory.close();
+            // entityManager.close();
+            // entityManagerFactory.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
-        } finally {
-            if ( entityManager != null ) entityManager.close();
-            if ( entityManagerFactory != null ) entityManagerFactory.close();
         }
+        // finally {
+        //     if ( entityManager != null ) entityManager.close();
+        //     if ( entityManagerFactory != null ) entityManagerFactory.close();
+        // }
         // EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
         // EntityManager entityManager = entityManagerFactory.createEntityManager();
         // entityManager.getTransaction().begin();
@@ -139,7 +140,7 @@ public class FrontControllerServlet extends HttpServlet {
     }
 
     public void destroy(){
-        // this.entityManager.close();
-        // this.entityManagerFactory.close();
+        this.entityManager.close();
+        this.entityManagerFactory.close();
     }
 }
