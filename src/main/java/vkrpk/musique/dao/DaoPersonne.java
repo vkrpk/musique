@@ -9,14 +9,14 @@ import vkrpk.musique.models.Personne;
 import vkrpk.musique.servlet.FrontControllerServlet;
 
 public class DaoPersonne {
-    private EntityManager entityManager = FrontControllerServlet.entityManager;
+    private EntityManager entityManager = FrontControllerServlet.getEntityManager();
 
     public List<Personne> findAll() {
-        return entityManager.createQuery("SELECT * FROM personne", Personne.class).getResultList();
+        return entityManager.createQuery("FROM Personne", Personne.class).getResultList();
     }
 
     public Personne findPersonById(int id) {
-        TypedQuery<Personne> query = entityManager.createQuery("SELECT * FROM Personne WHERE p.id = :id", Personne.class);
+        TypedQuery<Personne> query = entityManager.createQuery("SELECT p FROM Personne p WHERE p.id = :id", Personne.class);
         query.setParameter("id", id);
         return query.getSingleResult();
     }

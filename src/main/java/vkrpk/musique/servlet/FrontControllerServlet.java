@@ -40,18 +40,16 @@ public class FrontControllerServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
     private transient Map<String, Object> commands = new HashMap<>();
     private static final String COMPTEUR_PAGE = "compteurPage";
-    private EntityManagerFactory entityManagerFactory = null;
-    public static EntityManager entityManager = null;
+    private static EntityManagerFactory entityManagerFactory;
+    private static EntityManager entityManager;
 
     /**
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
     *
     * @param request servlet request
     * @param response servlet response
-    * @throws ServletException if a servlet-specific error occurs
-    * @throws IOException if an I/O error occurs
     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         String urlSuite = null;
         try {
             HttpSession session = request.getSession();
@@ -74,7 +72,12 @@ public class FrontControllerServlet extends HttpServlet {
             request.setAttribute("message", "Une erreur inconnues est survenue. Veuillez contacter l'administrateur du site.");
             LOGGER.log(Level.SEVERE, exception.getMessage());
         } finally {
-            request.getRequestDispatcher("WEB-INF/JSP" + urlSuite).forward(request, response);
+            try {
+                request.getRequestDispatcher("WEB-INF/JSP" + urlSuite).forward(request, response);
+            } catch (ServletException | IOException exception) {
+                LOGGER.log(Level.SEVERE, exception.getMessage());
+                System.exit(1);
+            }
         }
     }
 
@@ -110,37 +113,24 @@ public class FrontControllerServlet extends HttpServlet {
         try {
             entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
             entityManager = entityManagerFactory.createEntityManager();
-            // EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
-            // EntityManager entityManager = entityManagerFactory.createEntityManager();
-            // entityManager.getTransaction().begin();
-            // entityManager.persist(employee);
-            // entityManager.getTransaction().commit();
-            // entityManager.close();
-            // entityManagerFactory.close();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
-        // finally {
-        //     if ( entityManager != null ) entityManager.close();
-        //     if ( entityManagerFactory != null ) entityManagerFactory.close();
-        // }
-        // EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("default");
-        // EntityManager entityManager = entityManagerFactory.createEntityManager();
-        // entityManager.getTransaction().begin();
-        // entityManager.persist(employee);
-        // entityManager.getTransaction().commit();
-        // entityManager.close();
-        // entityManagerFactory.close();
-        // this.entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
         commands.put(null, new PageAccueilController());
         commands.put("liste", new PageListeController());
         commands.put("creation", new PageCreationController());
         commands.put("suppression", new PageSuppressionController());
         commands.put("modification", new PageModificationController());
+
+        commands.put("createUser", new vkrpk.musique.controllers.CreateUserController());
     }
 
     public void destroy(){
-        this.entityManager.close();
-        this.entityManagerFactory.close();
+        entityManagerFactory.close();
+        entityManager.close();
+    }
+
+    public static EntityManager getEntityManager() {
+        return entityManager;
     }
 }

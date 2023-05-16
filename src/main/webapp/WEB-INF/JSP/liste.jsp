@@ -3,9 +3,9 @@
     <jsp:param name="titre" value="Liste Personnes"/>
 </jsp:include>
 <c:choose>
-    <c:when test="${not empty listePersonnes}">
+    <c:when test="${not empty personnes}">
         <h1>${message}</h1>
-        <c:forEach items="${listePersonnes}" var="personne">
+        <c:forEach items="${personnes}" var="personne">
         <c:out value="${personne.nom}"/><p>
         <br>
         </c:forEach>

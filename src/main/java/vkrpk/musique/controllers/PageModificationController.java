@@ -19,13 +19,6 @@ public class PageModificationController implements ICommand {
     private static ArrayList<Personne> listePersonnes = new ArrayList<>();
     private Personne selectedPersonne = new Personne();
 
-    public PageModificationController() {
-        Personne personne = new Personne(1, "Nom 1", "Prenom 1");
-        Personne personne1 = new Personne(2, "Nom 2", "Prenom 2");
-        Personne personne2 = new Personne(3, "Nom 3", "Prénom 3");
-        Collections.addAll(listePersonnes, personne, personne1, personne2);
-    }
-
     public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
     {
         String parameterNom = request.getParameter("nom");
@@ -45,7 +38,7 @@ public class PageModificationController implements ICommand {
         }
 
         if(request.getParameterMap().containsKey("nom") && selectedPersonne.getId() != null){
-            Personne testValidationPersonne = new Personne(null, parameterNom, parameterPrenom);
+            Personne testValidationPersonne = new Personne(parameterNom, parameterPrenom);
             Set<ConstraintViolation<Personne>> violations = validator.validate(testValidationPersonne);
 
             SaisiePersonForm saisiePersonForm = new SaisiePersonForm();

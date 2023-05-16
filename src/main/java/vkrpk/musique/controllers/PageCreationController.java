@@ -20,13 +20,10 @@ public class PageCreationController implements ICommand {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
 
-        Personne personne1 = new Personne(2, "Nom 2", "Prenom 2");
-        Personne personne2 = new Personne(3, "Nom 3", "Prénom 3");
         ArrayList<Personne> listePersonnes = new ArrayList<>();
-        Collections.addAll(listePersonnes, personne1, personne2);
 
         if(request.getParameterMap().containsKey("nom")){
-            Personne personne = new Personne(null, request.getParameter("nom"), request.getParameter("prenom"));
+            Personne personne = new Personne(request.getParameter("nom"), request.getParameter("prenom"));
             Set<ConstraintViolation<Personne>> violations = validator.validate(personne);
             SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
             saisiePersonForm.verifForm(request);

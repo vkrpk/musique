@@ -3,7 +3,7 @@
     <jsp:param name="titre" value="Suppression Personne"/>
 </jsp:include>
 <form method="post">
-    <label class="mb-2" for="adherent-select">Modifier un adhérent:</label>
+    <label class="mb-2" for="adherent-select">Supprimer un adhérent:</label>
     <select name="supprimerAdherent" class="form-select mb-3" aria-label="Default select example" id="adherent-select">
         <c:forEach items="${listePersonnes}" var="personne">
             <option value="<c:out value="${personne.id}"/>">${personne.nom} ${personne.prenom}</option>

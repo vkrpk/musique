@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotEmpty;
 @Entity @Table(name = "user")
 public class User implements Serializable{
 
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     @NotEmpty(message = "Le nom d'utilisateur ne peut pas être vide")
     private String username;
 
@@ -21,14 +21,13 @@ public class User implements Serializable{
     @NotEmpty(message = "Le mot de passe ne peut pas être vide")
     private String password;
 
-    @Column(name = "identifiant")
+    @Column(name = "id")
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Integer identifiant;
+    private Integer id;
 
-    public User(String username, String password, Integer identifiant){
+    public User(String username, String password){
         this.username = username;
         this.password = password;
-        this.identifiant = identifiant;
     }
 
     public User(){}
@@ -47,9 +46,5 @@ public class User implements Serializable{
         this.password = password;
     }
 
-    public Integer getDdentifiant(){ return identifiant; }
-
-    public void setDdentifiant(Integer identifiant){
-        this.identifiant = identifiant;
-    }
+    public Integer getId(){ return id; }
 }
