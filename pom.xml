@@ -184,7 +184,7 @@
                 <cargo.tomcat.context.reloadable>true</cargo.tomcat.context.reloadable>
                 <cargo.remote.username>${catalina.admin.username}</cargo.remote.username>
                 <cargo.remote.password>${catalina.admin.password}</cargo.remote.password>
-                <cargo.hostname>${catalina.hostname}</cargo.hostname>
+                <cargo.hostname>localhost</cargo.hostname>
                 <cargo.servlet.port>8081</cargo.servlet.port>
               </properties>
             </configuration>
