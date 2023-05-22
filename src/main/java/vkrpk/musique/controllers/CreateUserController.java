@@ -1,6 +1,7 @@
 package vkrpk.musique.controllers;
 
-// import de.mkammerer.argon2.Argon2Factory;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

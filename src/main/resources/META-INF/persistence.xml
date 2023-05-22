@@ -1,18 +1,21 @@
-<persistence version="3.0"
-    xmlns="https://jakarta.ee/xml/ns/persistence"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd" version="3.0">
     <persistence-unit name="ecfMusique" transaction-type="RESOURCE_LOCAL">
         <properties>
             <!-- partie JPA générique -->
             <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:9806/ecf_musique?serverTimezone=UTC" />
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost/ecf_musique?serverTimezone=UTC" />
             <property name="jakarta.persistence.jdbc.user" value="root" />
-            <property name="jakarta.persistence.jdbc.password" value="root" />
+            <property name="jakarta.persistence.jdbc.password" value="" />
+
             <!-- partie spécifique Hibernate -->
             <property name="hibernate.show_sql" value="true" />
             <property name="hibernate.format_sql" value="true" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL57Dialect" />
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect" />
+            <!-- hibernate.dialect.storage_engine=myisam -->
+
         </properties>
     </persistence-unit>
 </persistence>
