@@ -14,6 +14,7 @@ import vkrpk.musique.exception.CommandExecutionException;
 import vkrpk.musique.exception.ExceptionDAO;
 import vkrpk.musique.models.Personne;
 import vkrpk.musique.models.forms.SaisiePersonForm;
+import vkrpk.musique.utils.CsrfTokenValidator;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,22 +37,30 @@ public class PageModificationController implements ICommand {
             List<Personne> listePersonnes = daoPersonne.findAll();
 
             if(request.getParameterMap().containsKey("modifierAdherent")){
-                Integer intIdPersonneAModifier = Integer.parseInt(request.getParameter("modifierAdherent"));
-                selectedPersonne = daoPersonne.findPersonById(intIdPersonneAModifier);
-                request.setAttribute(OLD_PERSON_VALUES, selectedPersonne);
+                if(CsrfTokenValidator.isValid(request)) {
+                    Integer intIdPersonneAModifier = Integer.parseInt(request.getParameter("modifierAdherent"));
+                    selectedPersonne = daoPersonne.findPersonById(intIdPersonneAModifier);
+                    request.setAttribute(OLD_PERSON_VALUES, selectedPersonne);
+                } else {
+                    return "/erreur.jsp";
+                }
             }
 
             if(request.getParameterMap().containsKey("nom") && selectedPersonne.getId() != null){
-                Personne testValidationPersonne = new Personne(parameterNom, parameterPrenom);
-                Set<ConstraintViolation<Personne>> violations = validator.validate(testValidationPersonne);
+                if(CsrfTokenValidator.isValid(request)) {
+                    Personne testValidationPersonne = new Personne(parameterNom, parameterPrenom);
+                    Set<ConstraintViolation<Personne>> violations = validator.validate(testValidationPersonne);
 
-                SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
-                saisiePersonForm.verifForm(request);
-                String resultatSaisi = saisiePersonForm.getResultat();
+                    SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
+                    saisiePersonForm.verifForm(request);
+                    String resultatSaisi = saisiePersonForm.getResultat();
 
-                checkSaisiPersonForm(resultatSaisi, request, testValidationPersonne);
-                checkViolations(violations, request, testValidationPersonne);
-                checkFormIsValid(violations, request, resultatSaisi);
+                    checkSaisiPersonForm(resultatSaisi, request, testValidationPersonne);
+                    checkViolations(violations, request, testValidationPersonne);
+                    checkFormIsValid(violations, request, resultatSaisi);
+                } else {
+                    return "/erreur.jsp";
+                }
             }
             request.setAttribute("selectedPersonne", selectedPersonne);
             request.setAttribute("listePersonnes", listePersonnes);

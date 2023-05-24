@@ -1,8 +1,13 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+String csrfToken = vkrpk.musique.utils.TokenHelper.getToken();
+session.setAttribute("csrfToken", csrfToken);
+%>
 <jsp:include page="./includes/header.jsp">
     <jsp:param name="titre" value="${controller eq 'creation' ? 'Ajouter un adhérent' : 'Modifier un adhérent'}"/>
 </jsp:include>
     <form method="post">
+        <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}"/>
         <c:if test="${controller eq 'modification'}">
             <label class="mb-2" for="adherent-select">Modifier un adhérent:</label>
             <select name="modifierAdherent" class="form-select mb-3" aria-label="Default select example" id="adherent-select">

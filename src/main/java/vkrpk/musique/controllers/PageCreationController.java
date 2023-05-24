@@ -13,6 +13,8 @@ import vkrpk.musique.exception.CommandExecutionException;
 import vkrpk.musique.exception.ExceptionDAO;
 import vkrpk.musique.models.Personne;
 import vkrpk.musique.models.forms.SaisiePersonForm;
+import vkrpk.musique.utils.CsrfTokenValidator;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,25 +28,29 @@ public class PageCreationController implements ICommand {
             Validator validator = factory.getValidator();
 
             if(request.getParameterMap().containsKey("nom")){
-                Personne personne = new Personne(request.getParameter("nom"), request.getParameter("prenom"));
-                Set<ConstraintViolation<Personne>> violations = validator.validate(personne);
-                SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
-                saisiePersonForm.verifForm(request);
-                String resultatSaisi = saisiePersonForm.getResultat();
+                if(CsrfTokenValidator.isValid(request)) {
+                    Personne personne = new Personne(request.getParameter("nom"), request.getParameter("prenom"));
+                    Set<ConstraintViolation<Personne>> violations = validator.validate(personne);
+                    SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
+                    saisiePersonForm.verifForm(request);
+                    String resultatSaisi = saisiePersonForm.getResultat();
 
-                if(!resultatSaisi.equals("OK")) {
-                    request.setAttribute("duplicateNom", resultatSaisi);
-                    request.setAttribute("oldPersonValues", personne);
-                }
-                if(!violations.isEmpty()) {
-                    request.setAttribute("violations", violations);
-                    request.setAttribute("oldPersonValues", personne);
-                }
+                    if(!resultatSaisi.equals("OK")) {
+                        request.setAttribute("duplicateNom", resultatSaisi);
+                        request.setAttribute("oldPersonValues", personne);
+                    }
+                    if(!violations.isEmpty()) {
+                        request.setAttribute("violations", violations);
+                        request.setAttribute("oldPersonValues", personne);
+                    }
 
-                if(violations.isEmpty() && resultatSaisi.equals("OK")){
-                    request.setAttribute("creationAdherentValide", "Un adhérent a bien été créé");
-                    DaoPersonne daoPersonne = new DaoPersonne();
-                        daoPersonne.save(personne);
+                    if(violations.isEmpty() && resultatSaisi.equals("OK")){
+                        request.setAttribute("creationAdherentValide", "Un adhérent a bien été créé");
+                        DaoPersonne daoPersonne = new DaoPersonne();
+                            daoPersonne.save(personne);
+                    }
+                } else {
+                    return "/erreur.jsp";
                 }
             }
             request.setAttribute("controller", "creation");

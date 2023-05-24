@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import vkrpk.musique.controllers.ConnexionController;
+import vkrpk.musique.controllers.CreateUserController;
+import vkrpk.musique.controllers.DeconnexionController;
 import vkrpk.musique.controllers.ICommand;
 import vkrpk.musique.controllers.PageAccueilController;
 import vkrpk.musique.controllers.PageCreationController;
@@ -39,6 +42,7 @@ import jakarta.servlet.http.HttpSession;
 public class FrontControllerServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(FrontControllerServlet.class.getName());
     private transient Map<String, Object> commands = new HashMap<>();
+    private transient Map<String, Object> commandsAdmin = new HashMap<>();
     private static final String COMPTEUR_PAGE = "compteurPage";
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
@@ -62,6 +66,11 @@ public class FrontControllerServlet extends HttpServlet {
             session.setAttribute(COMPTEUR_PAGE, (int) session.getAttribute(COMPTEUR_PAGE) + 1);
             String cmd = request.getParameter("cmd");
             ICommand com = (ICommand) commands.get(cmd);
+            if(session.getAttribute("role") == null) {
+                com = (ICommand) commands.get(cmd);
+            } else if(session.getAttribute("role").equals("admin")) {
+                com = (ICommand) commandsAdmin.get(cmd);
+            }
             urlSuite = com.execute(request, response);
         } catch (CommandExecutionException commandExecutionException) {
             urlSuite = "/erreur.jsp";
@@ -113,16 +122,19 @@ public class FrontControllerServlet extends HttpServlet {
         try {
             entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
             entityManager = entityManagerFactory.createEntityManager();
+
+            commands.put(null, new PageAccueilController());
+            commands.put("connexion", new ConnexionController());
+            commands.put("liste", new PageListeController());
+
+            commandsAdmin.put("suppression", new PageSuppressionController());
+            commandsAdmin.put("creation", new PageCreationController());
+            commandsAdmin.put("modification", new PageModificationController());
+            commandsAdmin.put("createUser", new CreateUserController());
+            commandsAdmin.put("deconnexion", new DeconnexionController());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.getMessage());
         }
-        commands.put(null, new PageAccueilController());
-        commands.put("liste", new PageListeController());
-        commands.put("suppression", new PageSuppressionController());
-        commands.put("creation", new PageCreationController());
-        commands.put("modification", new PageModificationController());
-
-        // commands.put("createUser", new vkrpk.musique.controllers.CreateUserController());
     }
 
     public void destroy(){

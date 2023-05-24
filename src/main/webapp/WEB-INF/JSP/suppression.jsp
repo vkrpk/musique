@@ -1,15 +1,14 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
 String csrfToken = vkrpk.musique.utils.TokenHelper.getToken();
-// session.setAttribute("csrfToken", csrfToken);
+session.setAttribute("csrfToken", csrfToken);
 %>
 <jsp:include page="./includes/header.jsp">
     <jsp:param name="titre" value="Suppression Personne"/>
 </jsp:include>
 <h4>Suppression d'un adhérent :</h4>
 <form method="post">
-    <input type="hidden" name="csrfToken" value="${csrfToken}"/>
-    <%session.setAttribute("csrftoken",${csrfToken});%>
+    <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}"/>
     <label class="mb-2" for="adherent-select">Supprimer un adhérent:</label>
     <select name="supprimerAdherent" class="form-select mb-3" aria-label="Default select example" id="adherent-select">
         <c:forEach items="${listePersonnes}" var="personne">

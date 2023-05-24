@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,15 +24,25 @@
               <li class="nav-item">
                 <a class="nav-link" href="<c:url value='/?cmd=liste'/>">Liste</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="<c:url value='/?cmd=creation'/>">Creation</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="<c:url value='/?cmd=modification'/>">Modification</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="<c:url value='/?cmd=suppression'/>">Suppression</a>
-              </li>
+              <c:if test="${sessionScope.status eq 'connected'}">
+                <li class="nav-item">
+                  <a class="nav-link" href="<c:url value='/?cmd=creation'/>">Creation</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="<c:url value='/?cmd=modification'/>">Modification</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="<c:url value='/?cmd=suppression'/>">Suppression</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="<c:url value='/?cmd=deconnexion'/>">Déconnexion</a>
+                </li>
+              </c:if>
+              <c:if test="${sessionScope.status ne 'connected'}">
+                <li class="nav-item">
+                  <a class="nav-link" href="<c:url value='/?cmd=connexion'/>">Connexion</a>
+                </li>
+              </c:if>
             </ul>
           </div>
         </div>
