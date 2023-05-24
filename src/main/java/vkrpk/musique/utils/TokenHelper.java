@@ -5,6 +5,10 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 public class TokenHelper {
+	private TokenHelper() {
+		throw new IllegalStateException("Utility class");
+	}
+
     public static String getToken() throws NoSuchAlgorithmException{
 	    // generate random data
 	    SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");

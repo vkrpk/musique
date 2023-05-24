@@ -1,7 +1,6 @@
 package vkrpk.musique.dao;
 
 import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import vkrpk.musique.exception.ExceptionDAO;
 import vkrpk.musique.models.User;

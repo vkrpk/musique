@@ -44,17 +44,13 @@ public class PageSuppressionController implements ICommand {
                 }
                 request.setAttribute("listePersonnes", daoPersonne.findAll());
         } catch (ExceptionDAO exceptionDAO) {
-            switch (exceptionDAO.getGravite()) {
-                case 5:
-                    exceptionDAO.printStackTrace();
+            if(exceptionDAO.getGravite() == 5) {
+                exceptionDAO.printStackTrace();
                     LOGGER.log(Level.SEVERE, exceptionDAO.getMessage());
                     System.exit(1);
-                    break;
             }
+            throw new CommandExecutionException(exceptionDAO.getMessage());
         } catch (Exception exception) {
-            exception.printStackTrace();
-            LOGGER.log(Level.SEVERE, exception.getMessage());
-            System.exit(1);
             throw new CommandExecutionException(exception.getMessage());
         }
         return "/suppression.jsp" ;

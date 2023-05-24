@@ -35,39 +35,48 @@ public class PageCreationController implements ICommand {
                     saisiePersonForm.verifForm(request);
                     String resultatSaisi = saisiePersonForm.getResultat();
 
-                    if(!resultatSaisi.equals("OK")) {
-                        request.setAttribute("duplicateNom", resultatSaisi);
-                        request.setAttribute("oldPersonValues", personne);
-                    }
-                    if(!violations.isEmpty()) {
-                        request.setAttribute("violations", violations);
-                        request.setAttribute("oldPersonValues", personne);
-                    }
-
-                    if(violations.isEmpty() && resultatSaisi.equals("OK")){
-                        request.setAttribute("creationAdherentValide", "Un adhérent a bien été créé");
-                        DaoPersonne daoPersonne = new DaoPersonne();
-                            daoPersonne.save(personne);
-                    }
+                    checkSaisiPersonForm(resultatSaisi, request, personne);
+                    checkViolations(violations, request, personne);
+                    checkFormIsValid(violations, request, resultatSaisi, personne);
                 } else {
                     return "/erreur.jsp";
                 }
             }
             request.setAttribute("controller", "creation");
         } catch (ExceptionDAO exceptionDAO) {
-            switch (exceptionDAO.getGravite()) {
-                case 5:
-                    exceptionDAO.printStackTrace();
+            if(exceptionDAO.getGravite() == 5) {
+                exceptionDAO.printStackTrace();
                     LOGGER.log(Level.SEVERE, exceptionDAO.getMessage());
                     System.exit(1);
-                    break;
             }
         } catch ( Exception exception) {
-            exception.printStackTrace();
-            LOGGER.log(Level.SEVERE, exception.getMessage());
-            System.exit(1);
             throw new CommandExecutionException(exception.getMessage());
         }
         return "/modification.jsp" ;
+    }
+
+    private HttpServletRequest checkSaisiPersonForm(String resultat, HttpServletRequest request, Personne personne){
+        if(!resultat.equals("OK")) {
+            request.setAttribute("duplicateNom", resultat);
+            request.setAttribute("oldPersonValues", personne);
+        }
+        return request;
+    }
+
+    private HttpServletRequest checkViolations(Set<ConstraintViolation<Personne>> violations, HttpServletRequest request, Personne personne){
+        if(!violations.isEmpty()) {
+            request.setAttribute("violations", violations);
+            request.setAttribute("oldPersonValues", personne);
+        }
+        return request;
+    }
+
+    private HttpServletRequest checkFormIsValid(Set<ConstraintViolation<Personne>> violations, HttpServletRequest request, String resultat, Personne personne) throws ExceptionDAO{
+        if(violations.isEmpty() && resultat.equals("OK")){
+            request.setAttribute("creationAdherentValide", "Un adhérent a bien été créé");
+            DaoPersonne daoPersonne = new DaoPersonne();
+            daoPersonne.save(personne);
+        }
+        return request;
     }
 }

@@ -1,7 +1,5 @@
 package vkrpk.musique.utils;
 
-import java.io.IOException;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.logging.Logger;
@@ -9,7 +7,11 @@ import java.util.logging.Logger;
 public class CsrfTokenValidator {
     private static final Logger LOGGER = Logger.getLogger(CsrfTokenValidator.class.getName());
 
-    public static boolean isValid(HttpServletRequest request) throws IOException {
+    private CsrfTokenValidator() {
+		throw new IllegalStateException("Utility class");
+	}
+
+    public static boolean isValid(HttpServletRequest request) {
         HttpSession session = request.getSession();
         String csrfTokenForm = request.getParameter("csrfToken");
         String csrfTokenSession = (String) session.getAttribute("csrfToken");

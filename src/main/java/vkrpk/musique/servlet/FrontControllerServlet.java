@@ -44,8 +44,8 @@ public class FrontControllerServlet extends HttpServlet {
     private transient Map<String, Object> commands = new HashMap<>();
     private transient Map<String, Object> commandsAdmin = new HashMap<>();
     private static final String COMPTEUR_PAGE = "compteurPage";
-    private static EntityManagerFactory entityManagerFactory;
-    private static EntityManager entityManager;
+    private static EntityManagerFactory entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
+    private static EntityManager entityManager = entityManagerFactory.createEntityManager();
 
     /**
     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
@@ -120,9 +120,6 @@ public class FrontControllerServlet extends HttpServlet {
     @Override
     public void init(){
         try {
-            entityManagerFactory = Persistence.createEntityManagerFactory("ecfMusique");
-            entityManager = entityManagerFactory.createEntityManager();
-
             commands.put(null, new PageAccueilController());
             commands.put("connexion", new ConnexionController());
             commands.put("liste", new PageListeController());
@@ -137,6 +134,7 @@ public class FrontControllerServlet extends HttpServlet {
         }
     }
 
+    @Override
     public void destroy(){
         entityManagerFactory.close();
         entityManager.close();

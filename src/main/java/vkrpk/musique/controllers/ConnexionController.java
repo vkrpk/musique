@@ -24,7 +24,7 @@ public class ConnexionController implements ICommand {
             User user = new DaoUser().findByPseudo(pseudo);
             Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id, 32, 64);
             boolean passwordMatch = argon2.verify(user.getPassword(), password.toCharArray());
-            if (user != null && passwordMatch) {
+            if (passwordMatch) {
                     LOGGER.info("Mot de passe correct");
                     request.setAttribute("loginSuccess","Connexion réussie.");
                     HttpSession session = request.getSession();
