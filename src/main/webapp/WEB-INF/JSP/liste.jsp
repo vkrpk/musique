@@ -4,11 +4,12 @@
 </jsp:include>
 <c:choose>
     <c:when test="${not empty personnes}">
-        <h1>${message}</h1>
-        <c:forEach items="${personnes}" var="personne">
-        <c:out value="${personne.nom}"/><p>
-        <br>
-        </c:forEach>
+        <h4>Liste des personnes adhérentes au club de musique :</h4>
+        <ul>
+            <c:forEach items="${personnes}" var="personne">
+                <li><c:out value="${personne.nom}"/> <c:out value="${personne.prenom}"/></li>
+            </c:forEach>
+        </ul>
     </c:when>
     <c:otherwise>
         <h1>Liste null</h1>

@@ -1,7 +1,6 @@
 package vkrpk.musique.controllers;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.validation.ConstraintViolation;
@@ -10,49 +9,67 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import vkrpk.musique.dao.DaoPersonne;
 import vkrpk.musique.exception.CommandExecutionException;
+import vkrpk.musique.exception.ExceptionDAO;
 import vkrpk.musique.models.Personne;
 import vkrpk.musique.models.forms.SaisiePersonForm;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class PageModificationController implements ICommand {
     private static final String OLD_PERSON_VALUES = "oldPersonValues";
-    private static ArrayList<Personne> listePersonnes = new ArrayList<>();
     private Personne selectedPersonne = new Personne();
+    private DaoPersonne daoPersonne = new DaoPersonne();
+    private static final Logger LOGGER = Logger.getLogger(PageModificationController.class.getName());
 
     public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
     {
-        String parameterNom = request.getParameter("nom");
-        String parameterPrenom = request.getParameter("prenom");
+        try {
+            String parameterNom = request.getParameter("nom");
+            String parameterPrenom = request.getParameter("prenom");
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            Validator validator = factory.getValidator();
 
-        if(request.getParameterMap().containsKey("modifierAdherent")){
-            for (Personne p : listePersonnes) {
-                if (Integer.toString(p.getId()).equals(request.getParameter("modifierAdherent"))) {
-                    selectedPersonne = p;
-                    break;
-                }
+            List<Personne> listePersonnes = daoPersonne.findAll();
+
+            if(request.getParameterMap().containsKey("modifierAdherent")){
+                Integer intIdPersonneAModifier = Integer.parseInt(request.getParameter("modifierAdherent"));
+                selectedPersonne = daoPersonne.findPersonById(intIdPersonneAModifier);
+                request.setAttribute(OLD_PERSON_VALUES, selectedPersonne);
             }
-            request.setAttribute(OLD_PERSON_VALUES, selectedPersonne);
+
+            if(request.getParameterMap().containsKey("nom") && selectedPersonne.getId() != null){
+                Personne testValidationPersonne = new Personne(parameterNom, parameterPrenom);
+                Set<ConstraintViolation<Personne>> violations = validator.validate(testValidationPersonne);
+
+                SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
+                saisiePersonForm.verifForm(request);
+                String resultatSaisi = saisiePersonForm.getResultat();
+
+                checkSaisiPersonForm(resultatSaisi, request, testValidationPersonne);
+                checkViolations(violations, request, testValidationPersonne);
+                checkFormIsValid(violations, request, resultatSaisi);
+            }
+            request.setAttribute("selectedPersonne", selectedPersonne);
+            request.setAttribute("listePersonnes", listePersonnes);
+            request.setAttribute("controller", "modification");
+        } catch (ExceptionDAO exceptionDAO) {
+            switch (exceptionDAO.getGravite()) {
+                case 5:
+                    exceptionDAO.printStackTrace();
+                    LOGGER.log(Level.SEVERE, exceptionDAO.getMessage());
+                    System.exit(1);
+                    break;
+            }
+        } catch ( Exception exception) {
+            exception.printStackTrace();
+            LOGGER.log(Level.SEVERE, exception.getMessage());
+            System.exit(1);
+            throw new CommandExecutionException(exception.getMessage());
         }
-
-        if(request.getParameterMap().containsKey("nom") && selectedPersonne.getId() != null){
-            Personne testValidationPersonne = new Personne(parameterNom, parameterPrenom);
-            Set<ConstraintViolation<Personne>> violations = validator.validate(testValidationPersonne);
-
-            SaisiePersonForm saisiePersonForm = new SaisiePersonForm();
-            saisiePersonForm.verifForm(request);
-            String resultatSaisi = saisiePersonForm.getResultat();
-
-            checkSaisiPersonForm(resultatSaisi, request, testValidationPersonne);
-            checkViolations(violations, request, testValidationPersonne);
-            checkFormIsValid(violations, request, resultatSaisi);
-        }
-        request.setAttribute("selectedPersonne", selectedPersonne);
-        request.setAttribute("listePersonnes", listePersonnes);
-        request.setAttribute("controller", "modification");
-
         return "/modification.jsp" ;
     }
 
@@ -72,18 +89,14 @@ public class PageModificationController implements ICommand {
         return request;
     }
 
-    private HttpServletRequest checkFormIsValid(Set<ConstraintViolation<Personne>> violations, HttpServletRequest request, String resultat){
+    private HttpServletRequest checkFormIsValid(Set<ConstraintViolation<Personne>> violations, HttpServletRequest request, String resultat) throws ExceptionDAO{
         if(violations.isEmpty() && resultat.equals("OK")){
-            for (Personne p : listePersonnes) {
-                if (p.getId().equals(selectedPersonne.getId())) {
-                    p.setNom(request.getParameter("nom"));
-                    p.setPrenom(request.getParameter("prenom"));
-                    break;
-                }
-            }
-            selectedPersonne = null;
-            request.setAttribute("modificationAdherentValide", "Un adhérent a bien été modifié");
+            selectedPersonne.setNom(request.getParameter("nom"));
+            selectedPersonne.setPrenom(request.getParameter("prenom"));
+            daoPersonne.save(selectedPersonne);
         }
+        selectedPersonne = null;
+        request.setAttribute("modificationAdherentValide", "Un adhérent a bien été modifié");
         return request;
     }
 }

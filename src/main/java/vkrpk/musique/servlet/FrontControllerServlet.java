@@ -118,9 +118,9 @@ public class FrontControllerServlet extends HttpServlet {
         }
         commands.put(null, new PageAccueilController());
         commands.put("liste", new PageListeController());
-        // commands.put("creation", new PageCreationController());
-        // commands.put("suppression", new PageSuppressionController());
-        // commands.put("modification", new PageModificationController());
+        commands.put("suppression", new PageSuppressionController());
+        commands.put("creation", new PageCreationController());
+        commands.put("modification", new PageModificationController());
 
         // commands.put("createUser", new vkrpk.musique.controllers.CreateUserController());
     }

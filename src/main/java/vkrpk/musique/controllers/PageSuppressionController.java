@@ -4,42 +4,47 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import vkrpk.musique.exception.CommandExecutionException;
+import vkrpk.musique.exception.ExceptionDAO;
 import vkrpk.musique.models.Personne;
-import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import vkrpk.musique.dao.DaoPersonne;
 
 public class PageSuppressionController implements ICommand {
-
-    private static List<Personne> listePersonnes = new DaoPersonne().findAll();
+    private static final Logger LOGGER = Logger.getLogger(PageSuppressionController.class.getName());
+    private static DaoPersonne daoPersonne = new DaoPersonne();
 
     public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
     {
-        request.setAttribute("listePersonnes", listePersonnes);
+        try {
+            if(request.getParameterMap().containsKey("supprimerAdherent")){
+                Integer intIdPersonneASupprimer = Integer.parseInt(request.getParameter("supprimerAdherent"));
+                Personne personne = daoPersonne.findPersonById(intIdPersonneASupprimer);
+                request.setAttribute("adherentASupprimer", personne);
+            }
 
-        if(request.getParameterMap().containsKey("supprimerAdherent")){
-            Personne personne = new DaoPersonne().findPersonById(Integer.parseInt(request.getParameter("supprimerAdherent")));
-            // Personne adherentASupprimer = null;
-            // for (Personne p : listePersonnes) {
-            //     if (Integer.toString(p.getId()).equals(request.getParameter("supprimerAdherent"))) {
-            //         adherentASupprimer = p;
-            //         break;
-            //     }
-            // }
-            request.setAttribute("adherentASupprimer", personne);
-        }
-
-        if(request.getParameterMap().containsKey("idAdherentASupprimer")){
-            // for (Personne p : listePersonnes) {
-            //     if (Integer.toString(p.getId()).equals(request.getParameter("idAdherentASupprimer"))) {
-            //         listePersonnes.remove(p);
-            //         break;
-            //     }
-            // }
-            Personne personne = new DaoPersonne().findPersonById(Integer.parseInt(request.getParameter("idAdherentASupprimer")));
-
-            new DaoPersonne().delete(personne);
-            request.setAttribute("adherentASupprimer", null);
-            request.setAttribute("suppressionAdherentValide", "Un adhérent a bien été supprimé");
+            if(request.getParameterMap().containsKey("idAdherentASupprimer")){
+                Integer intIdPersonneASupprimer = Integer.parseInt(request.getParameter("idAdherentASupprimer"));
+                Personne personne = daoPersonne.findPersonById(intIdPersonneASupprimer);
+                new DaoPersonne().delete(personne);
+                request.setAttribute("adherentASupprimer", null);
+                request.setAttribute("suppressionAdherentValide", "Un adhérent a bien été supprimé");
+            }
+            request.setAttribute("listePersonnes", daoPersonne.findAll());
+        } catch (ExceptionDAO exceptionDAO) {
+            switch (exceptionDAO.getGravite()) {
+                case 5:
+                    exceptionDAO.printStackTrace();
+                    LOGGER.log(Level.SEVERE, exceptionDAO.getMessage());
+                    System.exit(1);
+                    break;
+            }
+        } catch ( Exception exception) {
+            exception.printStackTrace();
+            LOGGER.log(Level.SEVERE, exception.getMessage());
+            System.exit(1);
+            throw new CommandExecutionException(exception.getMessage());
         }
         return "/suppression.jsp" ;
     }

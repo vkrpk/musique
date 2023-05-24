@@ -1,12 +1,23 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+String csrfToken = vkrpk.musique.utils.TokenHelper.getToken();
+// session.setAttribute("csrfToken", csrfToken);
+%>
 <jsp:include page="./includes/header.jsp">
     <jsp:param name="titre" value="Suppression Personne"/>
 </jsp:include>
+<h4>Suppression d'un adhérent :</h4>
 <form method="post">
+    <input type="hidden" name="csrfToken" value="${csrfToken}"/>
+    <%session.setAttribute("csrftoken",${csrfToken});%>
     <label class="mb-2" for="adherent-select">Supprimer un adhérent:</label>
     <select name="supprimerAdherent" class="form-select mb-3" aria-label="Default select example" id="adherent-select">
         <c:forEach items="${listePersonnes}" var="personne">
-            <option value="<c:out value="${personne.id}"/>">${personne.nom} ${personne.prenom}</option>
+            <option value="<c:out value="${personne.id}"/>"
+            <c:if test="${not empty adherentASupprimer.id and personne.id == adherentASupprimer.id}">
+                selected="selected"
+            </c:if>
+            >${personne.nom} ${personne.prenom}</option>
         </c:forEach>
     </select>
     <c:if test="${not empty adherentASupprimer}">
