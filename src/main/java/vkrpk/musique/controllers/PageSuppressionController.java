@@ -27,7 +27,7 @@ public class PageSuppressionController implements ICommand {
                         Personne personne = daoPersonne.findPersonById(intIdPersonneASupprimer);
                         request.setAttribute("adherentASupprimer", personne);
                     } else {
-                        return "/erreur.jsp";
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
                     }
                 }
 
@@ -39,7 +39,7 @@ public class PageSuppressionController implements ICommand {
                         request.setAttribute("adherentASupprimer", null);
                         request.setAttribute("suppressionAdherentValide", "Un adhérent a bien été supprimé");
                     } else {
-                        return "/erreur.jsp";
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
                     }
                 }
                 request.setAttribute("listePersonnes", daoPersonne.findAll());

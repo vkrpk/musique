@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpSession;
 import vkrpk.musique.dao.DaoUser;
 import vkrpk.musique.exception.CommandExecutionException;
 import vkrpk.musique.models.User;
+import vkrpk.musique.utils.CsrfTokenValidator;
+
 import java.util.logging.Logger;
 
 public class ConnexionController implements ICommand {
@@ -15,6 +17,11 @@ public class ConnexionController implements ICommand {
 
     public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
     {
+        if(CsrfTokenValidator.isValid(request)) {
+
+        } else {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
+        }
         String pseudo = request.getParameter("pseudo");
         String password = request.getParameter("password");
         if(pseudo == null && password == null) {

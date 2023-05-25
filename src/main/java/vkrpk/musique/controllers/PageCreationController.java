@@ -39,7 +39,7 @@ public class PageCreationController implements ICommand {
                     checkViolations(violations, request, personne);
                     checkFormIsValid(violations, request, resultatSaisi, personne);
                 } else {
-                    return "/erreur.jsp";
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
                 }
             }
             request.setAttribute("controller", "creation");

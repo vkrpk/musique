@@ -1,4 +1,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+String csrfToken = vkrpk.musique.utils.TokenHelper.getToken();
+session.setAttribute("csrfToken", csrfToken);
+%>
 <jsp:include page="./includes/header.jsp">
     <jsp:param name="titre" value="Connexion"/>
 </jsp:include>
@@ -8,6 +12,7 @@
   </div>
 </c:if>
 <form method="post">
+    <input type="hidden" name="csrfToken" value="${sessionScope.csrfToken}"/>
     <div class="mb-3">
         <label for="pseudo" class="form-label">Pseudo</label>
         <input type="pseudo" class="form-control" id="pseudo" aria-describedby="emailHelp" name="pseudo" value="<c:out value="${not empty oldUsername ? oldUsername : ''}"/>">

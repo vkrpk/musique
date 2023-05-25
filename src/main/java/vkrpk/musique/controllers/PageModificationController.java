@@ -42,7 +42,7 @@ public class PageModificationController implements ICommand {
                     selectedPersonne = daoPersonne.findPersonById(intIdPersonneAModifier);
                     request.setAttribute(OLD_PERSON_VALUES, selectedPersonne);
                 } else {
-                    return "/erreur.jsp";
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
                 }
             }
 
@@ -59,7 +59,7 @@ public class PageModificationController implements ICommand {
                     checkViolations(violations, request, testValidationPersonne);
                     checkFormIsValid(violations, request, resultatSaisi);
                 } else {
-                    return "/erreur.jsp";
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
                 }
             }
             request.setAttribute("selectedPersonne", selectedPersonne);

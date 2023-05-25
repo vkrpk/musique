@@ -74,11 +74,7 @@ public class FrontControllerServlet extends HttpServlet {
                 com = (ICommand) commands.get(cmd);
             }
             urlSuite = com.execute(request, response);
-        } catch (CommandExecutionException commandExecutionException) {
-            urlSuite = "/erreur.jsp";
-            request.setAttribute("message", "Une erreur inconnues est survenue. Veuillez contacter l'administrateur du site.");
-            LOGGER.log(Level.SEVERE, commandExecutionException.getMessage());
-        } catch (Exception exception) {
+        } catch (CommandExecutionException exception) {
             urlSuite = "/erreur.jsp";
             request.setAttribute("message", "Une erreur inconnues est survenue. Veuillez contacter l'administrateur du site.");
             LOGGER.log(Level.SEVERE, exception.getMessage());
