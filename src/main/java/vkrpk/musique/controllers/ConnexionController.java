@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import vkrpk.musique.dao.DaoUser;
 import vkrpk.musique.exception.CommandExecutionException;
+import vkrpk.musique.exception.ExceptionDAO;
 import vkrpk.musique.models.User;
 import vkrpk.musique.utils.CsrfTokenValidator;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConnexionController implements ICommand {
@@ -17,17 +19,20 @@ public class ConnexionController implements ICommand {
 
     public String execute(HttpServletRequest request, HttpServletResponse response) throws CommandExecutionException
     {
-        if(CsrfTokenValidator.isValid(request)) {
-
-        } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
-        }
-        String pseudo = request.getParameter("pseudo");
-        String password = request.getParameter("password");
-        if(pseudo == null && password == null) {
-            return "/connexion.jsp";
-        }
         try {
+            String pseudo = null;
+            String password = null;
+            if(request.getParameterMap().containsKey("pseudo") || request.getParameterMap().containsKey("password")){
+                if(CsrfTokenValidator.isValid(request)) {
+                    pseudo = request.getParameter("pseudo");
+                    password = request.getParameter("password");
+                } else {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Accès interdit.");
+                }
+            } else {
+                return "/connexion.jsp";
+            }
+
             User user = new DaoUser().findByPseudo(pseudo);
             Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id, 32, 64);
             boolean passwordMatch = argon2.verify(user.getPassword(), password.toCharArray());
@@ -41,10 +46,15 @@ public class ConnexionController implements ICommand {
                 request.setAttribute("loginFail", "L'identifiant et le mot de passe ne correspondent pas");
                 request.setAttribute("oldUsername", pseudo);
             }
-        } catch (Exception e) {
-            LOGGER.info("Erreur lors de la connexion");
-            request.setAttribute("loginFail", "L'identifiant et le mot de passe ne correspondent pas");
-            request.setAttribute("oldUsername", pseudo);
+        } catch (ExceptionDAO exceptionDAO) {
+            if(exceptionDAO.getGravite() == 5) {
+                exceptionDAO.printStackTrace();
+                    LOGGER.log(Level.SEVERE, exceptionDAO.getMessage());
+                    System.exit(1);
+            }
+            throw new CommandExecutionException(exceptionDAO.getMessage());
+        } catch (Exception exception) {
+            throw new CommandExecutionException(exception.getMessage());
         }
         return "/connexion.jsp" ;
     }
