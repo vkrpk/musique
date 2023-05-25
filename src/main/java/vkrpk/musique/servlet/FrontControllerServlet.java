@@ -64,12 +64,14 @@ public class FrontControllerServlet extends HttpServlet {
                 session.setAttribute(COMPTEUR_PAGE, 0);
             }
             session.setAttribute(COMPTEUR_PAGE, (int) session.getAttribute(COMPTEUR_PAGE) + 1);
+
             String cmd = request.getParameter("cmd");
             ICommand com = (ICommand) commands.get(cmd);
-            if(session.getAttribute("role") == null) {
+            if (commands.containsKey(cmd) && commandsAdmin.containsKey(cmd) && session.getAttribute("role") == null) {
+                cmd = "connexion";
                 com = (ICommand) commands.get(cmd);
-            } else if(session.getAttribute("role").equals("admin")) {
-                com = (ICommand) commandsAdmin.get(cmd);
+            } else {
+                com = (ICommand) commands.get(cmd);
             }
             urlSuite = com.execute(request, response);
         } catch (CommandExecutionException commandExecutionException) {
@@ -123,6 +125,11 @@ public class FrontControllerServlet extends HttpServlet {
             commands.put(null, new PageAccueilController());
             commands.put("connexion", new ConnexionController());
             commands.put("liste", new PageListeController());
+            commands.put("suppression", new PageSuppressionController());
+            commands.put("creation", new PageCreationController());
+            commands.put("modification", new PageModificationController());
+            commands.put("createUser", new CreateUserController());
+            commands.put("deconnexion", new DeconnexionController());
 
             commandsAdmin.put("suppression", new PageSuppressionController());
             commandsAdmin.put("creation", new PageCreationController());

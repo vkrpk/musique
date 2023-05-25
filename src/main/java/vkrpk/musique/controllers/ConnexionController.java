@@ -25,7 +25,6 @@ public class ConnexionController implements ICommand {
             Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id, 32, 64);
             boolean passwordMatch = argon2.verify(user.getPassword(), password.toCharArray());
             if (passwordMatch) {
-                    LOGGER.info("Mot de passe correct");
                     request.setAttribute("loginSuccess","Connexion réussie.");
                     HttpSession session = request.getSession();
                     session.setAttribute("role", "admin");
